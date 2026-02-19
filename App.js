@@ -1,20 +1,73 @@
+import React, { useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Home, ShoppingCart, User as UserIcon, Search } from 'lucide-react-native';
 
-export default function App() {
+import HomeScreen from './src/screens/HomeScreen';
+import ProductDetailScreen from './src/screens/ProductDetailScreen';
+import CartScreen from './src/screens/CartScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import { CartProvider } from './src/context/CartContext';
+
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+function TabNavigator() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => {
+          if (route.name === 'HomeTab') return <Home size={size} color={color} />;
+          if (route.name === 'Cart') return <ShoppingCart size={size} color={color} />;
+          if (route.name === 'Profile') return <UserIcon size={size} color={color} />;
+          return <Search size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#007AFF',
+        tabBarInactiveTintColor: 'gray',
+        headerShown: false,
+      })}
+    >
+      <Tab.Screen name="HomeTab" component={HomeScreen} options={{ title: 'Home' }} />
+      <Tab.Screen name="Cart" component={CartScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+    </Tab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  return (
+    <SafeAreaProvider>
+      <CartProvider>
+        <StatusBar style="dark" />
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ headerShadowVisible: false }}>
+            {!isAuthenticated ? (
+              <Stack.Screen name="Login">
+                {(props) => <LoginScreen {...props} onLogin={() => setIsAuthenticated(true)} />}
+              </Stack.Screen>
+            ) : (
+              <>
+                <Stack.Screen 
+                  name="Main" 
+                  component={TabNavigator} 
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen 
+                  name="ProductDetail" 
+                  component={ProductDetailScreen} 
+                  options={{ title: 'Product Details' }}
+                />
+              </>
+            )}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </CartProvider>
+    </SafeAreaProvider>
+  );
+}
