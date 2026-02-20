@@ -27,7 +27,7 @@ const HomeScreen = ({ navigation }) => {
       setProducts(response.data);
     } catch (err) {
       console.error('Error fetching products:', err.message);
-      setError('Gagal mengambil data produk. Pastikan backend sudah jalan.');
+      setError('Failed to fetch product data. Please ensure the backend is running.');
     } finally {
       setLoading(false);
     }
@@ -46,7 +46,7 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.centered}>
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={fetchProducts}>
-          <Text style={styles.retryText}>Coba Lagi</Text>
+          <Text style={styles.retryText}>Retry</Text>
         </TouchableOpacity>
       </View>
     );

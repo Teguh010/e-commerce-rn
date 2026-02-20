@@ -1,48 +1,78 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useAuth } from '../context/AuthContext';
 
-const LoginScreen = ({ navigation, onLogin }) => {
+const LoginScreen = () => {
+  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
+
   const formik = useFormik({
     initialValues: { email: '', password: '' },
     validationSchema: Yup.object({
       email: Yup.string().email('Invalid email').required('Required'),
       password: Yup.string().required('Required'),
     }),
-    onSubmit: (values) => {
-      onLogin();
+    onSubmit: async (values) => {
+      setLoading(true);
+      try {
+        await login(values.email, values.password);
+      } catch (err) {
+        Alert.alert('Login Failed', err.response?.data?.message || 'Invalid email or password');
+      } finally {
+        setLoading(false);
+      }
     },
   });
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>Sign in to continue shopping</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.subtitle}>Sign in to continue shopping</Text>
+        </View>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          onChangeText={formik.handleChange('email')}
-          value={formik.values.email}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        {formik.errors.email && <Text style={styles.error}>{formik.errors.email}</Text>}
+        <View style={styles.form}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="name@email.com"
+            onChangeText={formik.handleChange('email')}
+            value={formik.values.email}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          {formik.touched.email && formik.errors.email && (
+            <Text style={styles.error}>{formik.errors.email}</Text>
+          )}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          onChangeText={formik.handleChange('password')}
-          value={formik.values.password}
-        />
-        {formik.errors.password && <Text style={styles.error}>{formik.errors.password}</Text>}
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="********"
+            secureTextEntry
+            onChangeText={formik.handleChange('password')}
+            value={formik.values.password}
+          />
+          {formik.touched.password && formik.errors.password && (
+            <Text style={styles.error}>{formik.errors.password}</Text>
+          )}
 
-        <TouchableOpacity style={styles.button} onPress={formik.handleSubmit}>
-          <Text style={styles.buttonText}>Sign In</Text>
-        </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.button, loading && styles.buttonDisabled]} 
+            onPress={formik.handleSubmit}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Sign In Now</Text>
+            )}
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity style={styles.link} onPress={() => {}}>
           <Text style={styles.linkText}>Don't have an account? Sign up</Text>
