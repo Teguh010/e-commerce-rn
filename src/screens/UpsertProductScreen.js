@@ -9,7 +9,7 @@ import { Camera } from 'lucide-react-native';
 
 const BASE_API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 const PRODUCTS_API_URL = `${BASE_API_URL}/products`;
-const UPLOAD_API_URL = `${BASE_API_URL}/upload/image`;
+const UPLOAD_API_URL = `${PRODUCTS_API_URL}/upload-image`;
 
 const UpsertProductScreen = ({ route, navigation }) => {
   const { product } = route.params || {};
@@ -98,7 +98,7 @@ const UpsertProductScreen = ({ route, navigation }) => {
       console.error('Upload error:', { status, url, detail, err });
       const message =
         status === 404
-          ? `Endpoint tidak ditemukan (404). URL: ${url}. Pastikan backend jalan dan punya route POST /upload/image. Cek EXPO_PUBLIC_API_URL.`
+          ? `Endpoint tidak ditemukan (404). URL: ${url}. Pastikan backend jalan dan punya route POST /products/upload-image. Cek EXPO_PUBLIC_API_URL.`
           : `Gagal upload (${status || 'network'}): ${detail}`;
       Alert.alert('Upload Failed', message);
     } finally {
