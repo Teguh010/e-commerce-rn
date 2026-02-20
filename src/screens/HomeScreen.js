@@ -6,15 +6,8 @@ import ProductCard from '../components/ProductCard';
 import { useCart } from '../context/CartContext';
 
 
-// Logic to handle different environments
-const getApiUrl = () => {
-  if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:3000/products'; // Android Emulator access host localhost
-  }
-  return 'http://localhost:3000/products'; // iOS Simulator or Web
-};
-
-const API_URL = getApiUrl();
+// Use environment variable for the API base URL
+const API_URL = process.env.EXPO_PUBLIC_API_URL ? `${process.env.EXPO_PUBLIC_API_URL}/products` : 'http://localhost:3000/products';
 
 const HomeScreen = ({ navigation }) => {
   const [products, setProducts] = useState([]);
