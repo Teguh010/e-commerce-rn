@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { Trash2, Edit, Plus } from 'lucide-react-native';
 import axios from 'axios';
 
@@ -10,9 +11,11 @@ const AdminDashboardScreen = ({ navigation }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchProducts();
+    }, []),
+  );
 
   const fetchProducts = async () => {
     try {
